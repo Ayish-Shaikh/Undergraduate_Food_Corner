@@ -1,0 +1,15 @@
+@startuml
+title Cloud Food Corner
+
+actor Customer
+participant "Web App" as Web
+participant "Backend API" as API
+database DB
+
+Customer -> Web : Browse menu
+Web -> API : GET /menu
+API -> DB : Fetch items
+DB --> API : Menu data
+API --> Web : JSON response
+Web --> Customer : Show menu
+@enduml
