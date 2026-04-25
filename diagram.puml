@@ -2,14 +2,31 @@
 title Cloud Food Corner
 
 actor Customer
-participant "Web App" as Web
-participant "Backend API" as API
-database DB
+participant "Browser / Web App" as Web
+participant "Spring MVC Controller" as API
+participant "Thymeleaf View" as View
+database "Future DB" as DB
 
-Customer -> Web : Browse menu
+Customer -> Web : Open home page
+Web -> API : GET /api
+note right of API
+Current implemented endpoint:
+- GET /api
+end note
+
+API -> View : return "home"
+View --> Web : Render home.html
+Web --> Customer : Show welcome page
+
+== Future Planned APIs ==
 Web -> API : GET /menu
-API -> DB : Fetch items
+API -> DB : Fetch menu items
 DB --> API : Menu data
-API --> Web : JSON response
-Web --> Customer : Show menu
+API --> Web : JSON / rendered data
+
+Web -> API : POST /cart
+API --> Web : Cart updated
+
+Web -> API : POST /checkout
+API --> Web : Order confirmation
 @enduml
