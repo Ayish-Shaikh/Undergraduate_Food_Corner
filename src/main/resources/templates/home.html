@@ -3,10 +3,479 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Home Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangaliana</title>
+    <style>
+        :root {
+            --bg: #f6efe5;
+            --surface: #fff9f2;
+            --border: rgba(92, 52, 20, 0.14);
+            --text: #2f2118;
+            --muted: #6f5a49;
+            --accent: #9e5d2b;
+            --accent-soft: #ead7c4;
+            --body-radial: rgba(181, 126, 75, 0.16);
+            --body-start: #fbf5ee;
+            --body-end: #efe3d2;
+            --card-surface: #fffdf9;
+            --frame-start: #fffdf9;
+            --frame-end: #f1e5d7;
+            --tag-bg: rgba(47, 33, 24, 0.92);
+            --tag-text: #fffaf4;
+            --tag-muted: rgba(255, 250, 244, 0.72);
+            --shadow: 0 10px 24px rgba(70, 41, 18, 0.08);
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #15100d;
+            --surface: #1d1612;
+            --border: rgba(236, 213, 186, 0.12);
+            --text: #f4eadf;
+            --muted: #c8b39d;
+            --accent: #d18a50;
+            --accent-soft: rgba(209, 138, 80, 0.16);
+            --body-radial: rgba(209, 138, 80, 0.14);
+            --body-start: #1c140f;
+            --body-end: #120d0a;
+            --card-surface: #241b16;
+            --frame-start: #2a201a;
+            --frame-end: #1d1612;
+            --tag-bg: rgba(248, 236, 223, 0.94);
+            --tag-text: #241912;
+            --tag-muted: rgba(36, 25, 18, 0.68);
+            --shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #15100d;
+                --surface: #1d1612;
+                --border: rgba(236, 213, 186, 0.12);
+                --text: #f4eadf;
+                --muted: #c8b39d;
+                --accent: #d18a50;
+                --accent-soft: rgba(209, 138, 80, 0.16);
+                --body-radial: rgba(209, 138, 80, 0.14);
+                --body-start: #1c140f;
+                --body-end: #120d0a;
+                --card-surface: #241b16;
+                --frame-start: #2a201a;
+                --frame-end: #1d1612;
+                --tag-bg: rgba(248, 236, 223, 0.94);
+                --tag-text: #241912;
+                --tag-muted: rgba(36, 25, 18, 0.68);
+                --shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, var(--body-radial), transparent 28%),
+                linear-gradient(135deg, var(--body-start) 0%, var(--bg) 45%, var(--body-end) 100%);
+            padding: 32px 20px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.28s ease, transform 0.28s ease, background 0.3s ease, color 0.3s ease;
+        }
+
+        body.is-leaving {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 32px;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .brand-mark {
+            font-size: 0.8rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .brand-name {
+            font-size: 1.65rem;
+            font-weight: 700;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.95rem;
+            margin-left: 18px;
+            transition: color 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .nav a:hover {
+            opacity: 0.78;
+        }
+
+        .nav a.primary-link {
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #fffaf4;
+            margin-left: 24px;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
+        }
+
+        .nav a.primary-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .theme-toggle {
+            margin-left: 18px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: transform 0.22s ease, background-color 0.22s ease, border-color 0.22s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            background: var(--accent-soft);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 28px;
+            align-items: center;
+            padding: 24px 32px 40px;
+        }
+
+        .copy {
+            padding: 16px 0;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: clamp(2.4rem, 5vw, 4.9rem);
+            line-height: 0.96;
+            font-weight: 700;
+            max-width: 8ch;
+        }
+
+        .lead {
+            max-width: 40rem;
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 13px 20px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            color: var(--text);
+            background: transparent;
+            transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .button.primary {
+            background: var(--accent);
+            color: #fffaf4;
+            border-color: transparent;
+        }
+
+        .note {
+            margin-top: 28px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .note-card {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: var(--card-surface);
+            border: 1px solid var(--border);
+        }
+
+        .note-card strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.92rem;
+        }
+
+        .note-card span {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .visual {
+            position: relative;
+        }
+
+        .frame {
+            position: relative;
+            padding: 18px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, var(--frame-start), var(--frame-end));
+            border: 1px solid var(--border);
+        }
+
+        .frame img {
+            display: block;
+            width: 100%;
+            height: min(62vh, 540px);
+            object-fit: cover;
+            object-position: center;
+            border-radius: 20px;
+        }
+
+        .floating-tag {
+            position: absolute;
+            left: -10px;
+            bottom: 24px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            box-shadow: 0 8px 18px rgba(47, 33, 24, 0.12);
+        }
+
+        .floating-tag small {
+            display: block;
+            color: var(--tag-muted);
+            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+
+        .floating-tag strong {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .note {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .nav a {
+                margin: 0 12px 0 0;
+            }
+
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav a.primary-link {
+                margin-left: 0;
+            }
+
+            .hero {
+                padding: 8px 20px 24px;
+            }
+
+            .frame img {
+                height: 360px;
+            }
+
+            .floating-tag {
+                position: static;
+                margin-top: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Bangaliana- A taste from the corners of the East</h1>
-    <img src="images/homepage.png" style="width: 500px;  height: 500px" alt="Logo"/>
+<main class="shell">
+    <header class="nav">
+        <div class="brand">
+            <span class="brand-mark">Bengali Kitchen</span>
+            <span class="brand-name">Bangaliana</span>
+        </div>
+        <nav class="nav-links">
+            <a th:href="@{/api}">Home</a>
+            <a th:href="@{/api/menu}">Menu</a>
+            <a class="primary-link" th:href="@{/api/menu}">Order Now</a>
+            <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch theme">🌙</button>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="copy">
+            <span class="eyebrow">Minimal. Warm. Familiar.</span>
+            <h1>A taste from the corners of the East.</h1>
+            <p class="lead">
+                Traditional Bengali comfort food with a clean, modern presentation.
+                Browse the menu, find your favorites, and keep the experience simple.
+            </p>
+
+            <div class="actions">
+                <a class="button primary" th:href="@{/api/menu}">View Menu</a>
+                <a class="button" href="#highlights">Why Bangaliana</a>
+            </div>
+
+            <div class="note" id="highlights">
+                <div class="note-card">
+                    <strong>Authentic flavors</strong>
+                    <span>Recipes rooted in Bengali home-style cooking.</span>
+                </div>
+                <div class="note-card">
+                    <strong>Minimal experience</strong>
+                    <span>No clutter, just clear navigation and food-first design.</span>
+                </div>
+                <div class="note-card">
+                    <strong>Freshly prepared</strong>
+                    <span>Comfort dishes made for everyday cravings and family meals.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="visual">
+            <div class="frame">
+                <img th:src="@{/images/homepage.png}" alt="Bangaliana signature dish">
+            </div>
+            <div class="floating-tag">
+                <small>Signature Mood</small>
+                <strong>Warm plates, quiet design</strong>
+            </div>
+        </div>
+    </section>
+</main>
+<script>
+    (function () {
+        const root = document.documentElement;
+        const button = document.getElementById('theme-toggle');
+        const storageKey = 'bangaliana-theme';
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function resolvedTheme() {
+            const saved = localStorage.getItem(storageKey);
+            if (saved === 'light' || saved === 'dark') {
+                return saved;
+            }
+            return media.matches ? 'dark' : 'light';
+        }
+
+        function applyTheme(theme) {
+            root.setAttribute('data-theme', theme);
+            button.textContent = theme === 'dark' ? '☀️' : '🌙';
+            button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+        }
+
+        applyTheme(resolvedTheme());
+
+        button.addEventListener('click', function () {
+            const nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(storageKey, nextTheme);
+            applyTheme(nextTheme);
+        });
+
+        document.querySelectorAll('a[href]').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || link.target === '_blank') {
+                    return;
+                }
+                const url = new URL(link.href, window.location.origin);
+                if (url.origin !== window.location.origin) {
+                    return;
+                }
+                event.preventDefault();
+                document.body.classList.add('is-leaving');
+                window.setTimeout(function () {
+                    window.location.href = url.href;
+                }, 180);
+            });
+        });
+    }());
+</script>
 </body>
 </html>
