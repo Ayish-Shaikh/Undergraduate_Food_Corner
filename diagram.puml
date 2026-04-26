@@ -1,32 +1,96 @@
 @startuml
-title Cloud Food Corner
+title Cloud Food Corner - Current Request Flow
 
 actor Customer
-participant "Browser / Web App" as Web
-participant "Spring MVC Controller" as API
-participant "Thymeleaf View" as View
-database "Future DB" as DB
+participant "Browser" as Browser
+participant "HomeController" as HomeController
+participant "MenuController" as MenuController
+collections "Sample Menu List" as MenuList
+entity "Category enum" as Category
+participant "Thymeleaf home.html" as HomeView
+participant "Thymeleaf menu.html" as MenuView
 
-Customer -> Web : Open home page
-Web -> API : GET /api
-note right of API
-Current implemented endpoint:
-- GET /api
+== Home Page ==
+Customer -> Browser : Open application
+Browser -> HomeController : GET /api
+HomeController -> HomeView : return "home"
+HomeView --> Browser : Render homepage
+Browser --> Customer : Show landing page
+
+== Menu Page ==
+Customer -> Browser : Open menu
+Browser -> MenuController : GET /api/menu
+MenuController -> MenuController : getSampleMenu()
+MenuController -> MenuList : Build in-memory List<MenuItem>
+MenuList --> MenuController : menuItems
+MenuController -> Category : Read category values
+
+note right of MenuController
+Adds model attributes:
+- menuItems
+- mainCourse
+- streetFood
+- sweets
+- beverages
+- categories
 end note
 
-API -> View : return "home"
-View --> Web : Render home.html
-Web --> Customer : Show welcome page
+MenuController -> MenuView : return "menu" with model
+MenuView --> Browser : Render categorized menu
+Browser --> Customer : Show menu page
 
-== Future Planned APIs ==
-Web -> API : GET /menu
-API -> DB : Fetch menu items
-DB --> API : Menu data
-API --> Web : JSON / rendered data
+note bottom
+Current state:
+- Server-rendered Spring MVC app
+- Thymeleaf templates for UI
+- Menu data is hardcoded in MenuController
+- No database, cart, or checkout flow yet
+end note
 
-Web -> API : POST /cart
-API --> Web : Cart updated
+== Future Additions ==
+participant "MenuService" as MenuService
+database "Database" as DB
+participant "CartController" as CartController
+participant "CheckoutController" as CheckoutController
+participant "AuthController" as AuthController
+participant "PaymentController" as PaymentController
+participant "Payment Gateway" as PaymentGateway
 
-Web -> API : POST /checkout
-API --> Web : Order confirmation
+Browser -> MenuController : GET /api/menu
+MenuController -> MenuService : fetchMenu()
+MenuService -> DB : load menu items
+DB --> MenuService : menu data
+MenuService --> MenuController : categorized menu
+MenuController -> MenuView : return "menu"
+
+Browser -> CartController : POST /api/cart
+CartController -> MenuService : validate item / update cart
+CartController --> Browser : updated cart state
+
+Browser -> AuthController : POST /api/login
+AuthController -> DB : validate user credentials
+DB --> AuthController : user/session data
+AuthController --> Browser : login success / session created
+
+Browser -> CheckoutController : POST /api/checkout
+CheckoutController -> DB : save order
+DB --> CheckoutController : order id / status
+
+CheckoutController -> PaymentController : initiate payment
+PaymentController -> PaymentGateway : process payment
+PaymentGateway --> PaymentController : payment status
+PaymentController --> CheckoutController : payment result
+CheckoutController --> Browser : order confirmation / payment result
+
+note bottom
+Recommended next steps:
+- Move hardcoded menu items into a MenuService
+- Add persistence with a database and repositories
+- Add login and session handling
+- Introduce Cart and Checkout controllers
+- Integrate a payment gateway
+- Store orders and cart state
+- Add DTOs or REST APIs if frontend becomes dynamic
+- Add authentication if user-specific orders are needed
+end note
 @enduml
