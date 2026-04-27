@@ -349,6 +349,16 @@
             border-bottom: 1px solid var(--line);
         }
 
+        .food-img-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
         .food-body {
             display: flex;
             flex-direction: column;
@@ -536,9 +546,11 @@
             <div class="food-grid">
                 <article class="food-card" th:each="item : ${mainCourse}">
                     <img class="food-img"
+                         th:if="${item.imageUrl != null}"
                          th:src="@{${item.imageUrl}}"
                          th:alt="${item.name}"
                          onerror="this.style.background='#efe2d4'"/>
+                    <div class="food-img food-img-placeholder" th:unless="${item.imageUrl != null}">Image unavailable</div>
                     <div class="food-body">
                         <div class="food-top">
                             <h3 class="food-name" th:text="${item.name}">Item Name</h3>
@@ -562,9 +574,11 @@
             <div class="food-grid">
                 <article class="food-card" th:each="item : ${streetFood}">
                     <img class="food-img"
+                         th:if="${item.imageUrl != null}"
                          th:src="@{${item.imageUrl}}"
                          th:alt="${item.name}"
                          onerror="this.style.background='#efe2d4'"/>
+                    <div class="food-img food-img-placeholder" th:unless="${item.imageUrl != null}">Image unavailable</div>
                     <div class="food-body">
                         <div class="food-top">
                             <h3 class="food-name" th:text="${item.name}">Item Name</h3>
@@ -588,9 +602,11 @@
             <div class="food-grid">
                 <article class="food-card" th:each="item : ${sweets}">
                     <img class="food-img"
+                         th:if="${item.imageUrl != null}"
                          th:src="@{${item.imageUrl}}"
                          th:alt="${item.name}"
                          onerror="this.style.background='#efe2d4'"/>
+                    <div class="food-img food-img-placeholder" th:unless="${item.imageUrl != null}">Image unavailable</div>
                     <div class="food-body">
                         <div class="food-top">
                             <h3 class="food-name" th:text="${item.name}">Item Name</h3>
@@ -614,9 +630,11 @@
             <div class="food-grid">
                 <article class="food-card" th:each="item : ${beverages}">
                     <img class="food-img"
+                         th:if="${item.imageUrl != null}"
                          th:src="@{${item.imageUrl}}"
                          th:alt="${item.name}"
                          onerror="this.style.background='#efe2d4'"/>
+                    <div class="food-img food-img-placeholder" th:unless="${item.imageUrl != null}">Image unavailable</div>
                     <div class="food-body">
                         <div class="food-top">
                             <h3 class="food-name" th:text="${item.name}">Item Name</h3>
@@ -683,4 +701,3 @@
 </script>
 </body>
 </html>
-
