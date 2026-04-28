@@ -5,7 +5,8 @@ actor Customer
 participant "Browser" as Browser
 participant "HomeController" as HomeController
 participant "MenuController" as MenuController
-collections "Sample Menu List" as MenuList
+participant "MenuService" as MenuService
+collections "In-memory Menu List" as MenuList
 entity "Category enum" as Category
 participant "Thymeleaf home.html" as HomeView
 participant "Thymeleaf menu.html" as MenuView
@@ -20,9 +21,26 @@ Browser --> Customer : Show landing page
 == Menu Page ==
 Customer -> Browser : Open menu
 Browser -> MenuController : GET /api/menu
-MenuController -> MenuController : getSampleMenu()
-MenuController -> MenuList : Build in-memory List<MenuItem>
-MenuList --> MenuController : menuItems
+MenuController -> MenuService : getAllItems()
+MenuService -> MenuList : Build in-memory List<MenuItem>
+MenuList --> MenuService : menuItems
+MenuService --> MenuController : menuItems
+MenuController -> MenuService : getByCategory(MAIN_COURSE)
+MenuService -> MenuList : filter by category
+MenuList --> MenuService : mainCourse
+MenuService --> MenuController : mainCourse
+MenuController -> MenuService : getByCategory(STREET_FOOD)
+MenuService -> MenuList : filter by category
+MenuList --> MenuService : streetFood
+MenuService --> MenuController : streetFood
+MenuController -> MenuService : getByCategory(SWEETS)
+MenuService -> MenuList : filter by category
+MenuList --> MenuService : sweets
+MenuService --> MenuController : sweets
+MenuController -> MenuService : getByCategory(BEVERAGES)
+MenuService -> MenuList : filter by category
+MenuList --> MenuService : beverages
+MenuService --> MenuController : beverages
 MenuController -> Category : Read category values
 
 note right of MenuController
@@ -43,12 +61,12 @@ note bottom
 Current state:
 - Server-rendered Spring MVC app
 - Thymeleaf templates for UI
-- Menu data is hardcoded in MenuController
+- Menu data is built in MenuService
+- MenuService filters menu items by category in memory
 - No database, cart, or checkout flow yet
 end note
 
 == Future Additions ==
-participant "MenuService" as MenuService
 database "Database" as DB
 participant "CartController" as CartController
 participant "CheckoutController" as CheckoutController
@@ -84,7 +102,6 @@ CheckoutController --> Browser : order confirmation / payment result
 
 note bottom
 Recommended next steps:
-- Move hardcoded menu items into a MenuService
 - Add persistence with a database and repositories
 - Add login and session handling
 - Introduce Cart and Checkout controllers
