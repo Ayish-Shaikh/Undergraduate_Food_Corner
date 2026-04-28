@@ -1,10 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Bangaliana - Place Order</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #FDF6EC; }
+        .container { max-width: 500px; margin: 40px auto; padding: 20px;
+            background: white; border-radius: 10px;
+            border: 1px solid #FAC775; }
+        h1 { color: #633806; }
+        label { display: block; margin-top: 12px; color: #854F0B; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 8px; margin-top: 4px;
+            border: 1px solid #FAC775; border-radius: 6px; }
+        .submit-btn { margin-top: 20px; padding: 10px 24px;
+            background: #BA7517; color: #FAEEDA;
+            border: none; border-radius: 6px;
+            font-size: 14px; cursor: pointer; }
+        .back-link { display: inline-block; margin-top: 12px;
+            color: #854F0B; text-decoration: none; font-size: 13px; }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <h1>Place Your Order</h1>
+    <p style="color:#854F0B;">Fill in your details and we'll deliver!</p>
+
+    <form method="POST" th:action="@{/api/order}" th:object="${order}">
+
+        <label for="customerName">Your Name</label>
+        <input type="text" id="customerName" th:field="*{customerName}"
+               placeholder="e.g. Rahul Das"/>
+
+        <label for="deliveryAddress">Delivery Address</label>
+        <input type="text" id="deliveryAddress" th:field="*{deliveryAddress}"
+               placeholder="e.g. 12 College Street, Kolkata"/>
+
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" th:field="*{phone}"
+               placeholder="e.g. 9876543210"/>
+
+        <button class="submit-btn" type="submit">Place Order</button>
+    </form>
+
+    <a class="back-link" th:href="@{/api/menu}">&larr; Back to Menu</a>
+</div>
 </body>
 </html>
