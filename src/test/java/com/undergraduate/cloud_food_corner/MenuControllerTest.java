@@ -73,7 +73,7 @@ class MenuControllerTest {
         when(menuService.getByCategory(Category.SWEETS)).thenReturn(List.of(mishtiDoi));
         when(menuService.getByCategory(Category.BEVERAGES)).thenReturn(List.of(lassi));
 
-        mockMvc.perform(get("/api/menu"))
+        mockMvc.perform(get("/menu"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("menu"))
                 .andExpect(model().attributeExists(

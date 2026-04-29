@@ -26,7 +26,7 @@
     <h1>Place Your Order</h1>
     <p style="color:#854F0B;">Fill in your details and we'll deliver!</p>
 
-    <form method="POST" th:action="@{/api/order}" th:object="${order}">
+    <form method="POST" th:action="@{/order}" th:object="${order}">
 
         <label for="customerName">Your Name</label>
         <input type="text" id="customerName" th:field="*{customerName}"
@@ -43,7 +43,7 @@
         <button class="submit-btn" type="submit">Place Order</button>
     </form>
 
-    <a class="back-link" th:href="@{/api/menu}">&larr; Back to Menu</a>
+    <a class="back-link" th:href="@{/menu}">&larr; Back to Menu</a>
 </div>
 </body>
 </html>

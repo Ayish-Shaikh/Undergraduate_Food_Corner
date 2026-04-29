@@ -2,17 +2,18 @@ package com.undergraduate.cloud_food_corner.controller;
 
 
 import com.undergraduate.cloud_food_corner.model.Order;
-import org.springframework.ui.Model;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Slf4j
 @Controller
-@RequestMapping("/api/order")
+@RequestMapping("/order")
 public class OrderController {
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @GetMapping("/current")
     public String orderForm(Model model){
@@ -22,7 +23,7 @@ public class OrderController {
 
     @PostMapping
     public String processOrder(Order order){
-        log.info("Order submitted: " + order);
-        return "redirect:/api";
+        logger.info("Order submitted: {}", order);
+        return "redirect:/";
     }
 }

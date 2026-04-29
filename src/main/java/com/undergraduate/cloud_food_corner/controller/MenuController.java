@@ -5,9 +5,7 @@ import com.undergraduate.cloud_food_corner.service.MenuService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
-@RequestMapping("/api/menu")
 public class MenuController {
 
     private final MenuService menuService;
@@ -16,7 +14,7 @@ public class MenuController {
         this.menuService = menuService;
     }
 
-    @GetMapping
+    @GetMapping("/menu")
     public String showMenu(Model model){
         model.addAttribute("menuItems", menuService.getAllItems());
         model.addAttribute("mainCourse", menuService.getByCategory(Category.MAIN_COURSE));
