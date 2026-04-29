@@ -16,14 +16,14 @@ participant "Thymeleaf orderForm.html" as OrderFormView
 
 == Home Page ==
 Customer -> Browser : Open application
-Browser -> HomeController : GET /api
+Browser -> HomeController : GET /
 HomeController -> HomeView : return "home"
 HomeView --> Browser : Render homepage
 Browser --> Customer : Show home page
 
 == Menu Page ==
 Customer -> Browser : Open menu
-Browser -> MenuController : GET /api/menu
+Browser -> MenuController : GET /menu
 MenuController -> MenuService : getAllItems()
 MenuService -> MenuList : Build in-memory List<MenuItem>
 MenuList --> MenuService : menuItems
@@ -62,7 +62,7 @@ Browser --> Customer : Show menu page
 
 == Order Form ==
 Customer -> Browser : Click "Place Order"
-Browser -> OrderController : GET /api/order/current
+Browser -> OrderController : GET /order/current
 OrderController -> Order : new Order()
 OrderController -> OrderFormView : return "orderForm" with order
 OrderFormView --> Browser : Render order form
@@ -70,10 +70,10 @@ Browser --> Customer : Show order form
 
 == Order Submission ==
 Customer -> Browser : Submit order details
-Browser -> OrderController : POST /api/order
+Browser -> OrderController : POST /order
 OrderController -> OrderController : log submitted Order
-OrderController --> Browser : redirect:/api
-Browser -> HomeController : GET /api
+OrderController --> Browser : redirect:/
+Browser -> HomeController : GET /
 HomeController -> HomeView : return "home"
 HomeView --> Browser : Render homepage
 Browser --> Customer : Show redirected home page
@@ -103,12 +103,12 @@ DB --> MenuService : menu items
 MenuService --> MenuController : categorized menu
 MenuController -> MenuView : return "menu"
 
-Browser -> CartController : POST /api/cart
+Browser -> CartController : POST /cart
 CartController -> DB : store cart state
 DB --> CartController : updated cart
 CartController --> Browser : updated cart response/view
 
-Browser -> CheckoutController : POST /api/checkout
+Browser -> CheckoutController : POST /checkout
 CheckoutController -> DB : save order
 DB --> CheckoutController : order id / status
 CheckoutController -> PaymentController : initiate payment
