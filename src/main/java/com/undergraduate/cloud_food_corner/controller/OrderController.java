@@ -2,10 +2,12 @@ package com.undergraduate.cloud_food_corner.controller;
 
 
 import com.undergraduate.cloud_food_corner.model.Order;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +24,11 @@ public class OrderController {
     }
 
     @PostMapping
-    public String processOrder(Order order){
+    public String processOrder(@Valid Order order, BindingResult result){
+        if (result.hasErrors()) {
+            logger.info("Validation errors: {}", result.getAllErrors());
+            return "orderForm";
+        }
         logger.info("Order submitted: {}", order);
         return "redirect:/";
     }
