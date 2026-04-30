@@ -20,7 +20,6 @@ public class Order {
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
     private String phone;
 
-    @Size(min = 1, message = "Order must have items")
     private List<MenuItem> items = new ArrayList<>();
 
     public void addItem(MenuItem item){
