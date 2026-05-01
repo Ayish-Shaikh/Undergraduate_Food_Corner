@@ -1,5 +1,5 @@
 @startuml
-title Cloud Food Corner - Current Request Flow
+title Cloud Food Corner - Current Application Flow
 
 actor Customer
 participant "Browser" as Browser
@@ -7,9 +7,11 @@ participant "HomeController" as HomeController
 participant "MenuController" as MenuController
 participant "OrderController" as OrderController
 participant "MenuService" as MenuService
-collections "In-memory Menu List" as MenuList
-entity "Category enum" as Category
-entity "Order model" as Order
+participant "MenuItemRepository" as MenuItemRepository
+participant "OrderRepository" as OrderRepository
+database "H2 Database" as DB
+entity "Category.CategoryType" as CategoryType
+entity "Order Entity" as Order
 participant "Thymeleaf home.html" as HomeView
 participant "Thymeleaf menu.html" as MenuView
 participant "Thymeleaf orderForm.html" as OrderFormView
@@ -24,27 +26,47 @@ Browser --> Customer : Show home page
 == Menu Page ==
 Customer -> Browser : Open menu
 Browser -> MenuController : GET /menu
+
 MenuController -> MenuService : getAllItems()
-MenuService -> MenuList : Build in-memory List<MenuItem>
-MenuList --> MenuService : menuItems
+MenuService -> MenuItemRepository : findAll()
+MenuItemRepository -> DB : load menu items
+DB --> MenuItemRepository : menu items
+MenuItemRepository --> MenuService : menuItems
 MenuService --> MenuController : menuItems
+
 MenuController -> MenuService : getByCategory(MAIN_COURSE)
-MenuService -> MenuList : filter by category
-MenuList --> MenuService : mainCourse
+MenuService -> MenuItemRepository : findAll()
+MenuItemRepository -> DB : load menu items
+DB --> MenuItemRepository : menu items
+MenuItemRepository --> MenuService : menuItems
+MenuService -> CategoryType : filter by MAIN_COURSE
 MenuService --> MenuController : mainCourse
+
 MenuController -> MenuService : getByCategory(STREET_FOOD)
-MenuService -> MenuList : filter by category
-MenuList --> MenuService : streetFood
+MenuService -> MenuItemRepository : findAll()
+MenuItemRepository -> DB : load menu items
+DB --> MenuItemRepository : menu items
+MenuItemRepository --> MenuService : menuItems
+MenuService -> CategoryType : filter by STREET_FOOD
 MenuService --> MenuController : streetFood
+
 MenuController -> MenuService : getByCategory(SWEETS)
-MenuService -> MenuList : filter by category
-MenuList --> MenuService : sweets
+MenuService -> MenuItemRepository : findAll()
+MenuItemRepository -> DB : load menu items
+DB --> MenuItemRepository : menu items
+MenuItemRepository --> MenuService : menuItems
+MenuService -> CategoryType : filter by SWEETS
 MenuService --> MenuController : sweets
+
 MenuController -> MenuService : getByCategory(BEVERAGES)
-MenuService -> MenuList : filter by category
-MenuList --> MenuService : beverages
+MenuService -> MenuItemRepository : findAll()
+MenuItemRepository -> DB : load menu items
+DB --> MenuItemRepository : menu items
+MenuItemRepository --> MenuService : menuItems
+MenuService -> CategoryType : filter by BEVERAGES
 MenuService --> MenuController : beverages
-MenuController -> Category : Read category values
+
+MenuController -> CategoryType : read values()
 
 note right of MenuController
 Adds model attributes:
@@ -71,59 +93,66 @@ Browser --> Customer : Show order form
 == Order Submission ==
 Customer -> Browser : Submit order details
 Browser -> OrderController : POST /order
-OrderController -> OrderController : log submitted Order
-OrderController --> Browser : redirect:/
-Browser -> HomeController : GET /
-HomeController -> HomeView : return "home"
-HomeView --> Browser : Render homepage
-Browser --> Customer : Show redirected home page
+OrderController -> OrderController : validate submitted Order
 
-note bottom
+alt Validation errors
+    OrderController -> OrderFormView : return "orderForm"
+    OrderFormView --> Browser : Render validation errors
+    Browser --> Customer : Show form with field errors
+else Valid order
+    OrderController -> OrderRepository : save(order)
+    OrderRepository -> DB : insert into orders
+    DB --> OrderRepository : saved order
+    OrderRepository --> OrderController : saved order
+    OrderController -> OrderController : log submitted Order
+    OrderController --> Browser : redirect:/
+    Browser -> HomeController : GET /
+    HomeController -> HomeView : return "home"
+    HomeView --> Browser : Render homepage
+    Browser --> Customer : Show redirected home page
+end
+
+note over Browser, DB
 Current state:
 - Server-rendered Spring MVC app
 - Thymeleaf templates for UI
-- Menu data is built in MenuService
-- MenuService filters menu items by category in memory
-- Order form binds to the Order model
-- Submitted orders are logged only
-- No database, cart persistence, or payment flow yet
+- H2 in-memory database configured
+- Menu items are loaded through MenuItemRepository
+- MenuService still filters categories in memory after loading all items
+- Order form binds to the Order entity
+- Valid submitted orders are saved through OrderRepository
+- No cart, checkout, payment gateway, or order tracking flow yet
 end note
 
 == Future Improvements ==
-database "Database" as DB
 participant "CartController" as CartController
 participant "CheckoutController" as CheckoutController
 participant "PaymentController" as PaymentController
 participant "Payment Gateway" as PaymentGateway
 
-Browser -> MenuController : GET /api/menu
-MenuController -> MenuService : fetch menu from persistence
-MenuService -> DB : load menu items
-DB --> MenuService : menu items
-MenuService --> MenuController : categorized menu
-MenuController -> MenuView : return "menu"
-
 Browser -> CartController : POST /cart
 CartController -> DB : store cart state
 DB --> CartController : updated cart
-CartController --> Browser : updated cart response/view
+CartController --> Browser : updated cart view/response
 
 Browser -> CheckoutController : POST /checkout
-CheckoutController -> DB : save order
-DB --> CheckoutController : order id / status
+CheckoutController -> OrderRepository : save finalized order
+OrderRepository -> DB : persist order and status
+DB --> OrderRepository : order id / status
+OrderRepository --> CheckoutController : saved order
 CheckoutController -> PaymentController : initiate payment
 PaymentController -> PaymentGateway : process payment
 PaymentGateway --> PaymentController : payment status
 PaymentController --> CheckoutController : payment result
 CheckoutController --> Browser : order confirmation
 
-note bottom
+note over CartController, PaymentGateway
 Recommended next steps:
-- Add persistence with a database and repositories
-- Store cart and order state
-- Add a checkout flow
+- Use repository queries for category-specific menu loading
+- Add cart persistence and cart UI state
+- Add checkout flow before final order submission
 - Integrate payment processing
 - Add order confirmation and status tracking
-- Introduce validation for submitted order data
+- Persist selected menu items with the order
 end note
 @enduml
