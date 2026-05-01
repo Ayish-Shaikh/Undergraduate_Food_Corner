@@ -31,47 +31,48 @@ class MenuControllerTest {
 
     @Test
     void testMenuPage() throws Exception {
+        Category mainCourseCategory = new Category("Main Course", Category.CategoryType.MAIN_COURSE);
+        Category streetFoodCategory = new Category("Street Food", Category.CategoryType.STREET_FOOD);
+        Category sweetsCategory = new Category("Sweets", Category.CategoryType.SWEETS);
+        Category beveragesCategory = new Category("Beverages", Category.CategoryType.BEVERAGES);
+
         MenuItem ilishBhapa = new MenuItem(
-                1L,
                 "Ilish Bhapa",
                 "Steamed hilsa in mustard",
                 220.0,
-                Category.MAIN_COURSE,
+                mainCourseCategory,
                 "/images/ilishbhapa.png"
         );
 
         MenuItem phuchka = new MenuItem(
-                2L,
                 "Phuchka",
                 "Tamarind water crispy puri",
                 60.0,
-                Category.STREET_FOOD,
+                streetFoodCategory,
                 "/images/phuchka.png"
         );
 
         MenuItem mishtiDoi = new MenuItem(
-                3L,
                 "Mishti Doi",
                 "Sweet fermented yoghurt",
                 70.0,
-                Category.SWEETS,
+                sweetsCategory,
                 "/images/mistidoi.png"
         );
 
         MenuItem lassi = new MenuItem(
-                4L,
                 "Lassi",
                 "Sweet yoghurt drink",
                 70.0,
-                Category.BEVERAGES,
+                beveragesCategory,
                 null
         );
 
         when(menuService.getAllItems()).thenReturn(List.of(ilishBhapa, phuchka, mishtiDoi, lassi));
-        when(menuService.getByCategory(Category.MAIN_COURSE)).thenReturn(List.of(ilishBhapa));
-        when(menuService.getByCategory(Category.STREET_FOOD)).thenReturn(List.of(phuchka));
-        when(menuService.getByCategory(Category.SWEETS)).thenReturn(List.of(mishtiDoi));
-        when(menuService.getByCategory(Category.BEVERAGES)).thenReturn(List.of(lassi));
+        when(menuService.getByCategory(Category.CategoryType.MAIN_COURSE)).thenReturn(List.of(ilishBhapa));
+        when(menuService.getByCategory(Category.CategoryType.STREET_FOOD)).thenReturn(List.of(phuchka));
+        when(menuService.getByCategory(Category.CategoryType.SWEETS)).thenReturn(List.of(mishtiDoi));
+        when(menuService.getByCategory(Category.CategoryType.BEVERAGES)).thenReturn(List.of(lassi));
 
         mockMvc.perform(get("/menu"))
                 .andExpect(status().isOk())
