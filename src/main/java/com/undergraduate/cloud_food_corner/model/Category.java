@@ -1,19 +1,47 @@
 package com.undergraduate.cloud_food_corner.model;
 
-public enum Category {
+import jakarta.persistence.*;
+import lombok.Data;
 
-    MAIN_COURSE("Main Course"),
-    STREET_FOOD("Street Food"),
-    SWEETS("Sweets"),
-    BEVERAGES("Beverages");
+@Entity
+@Table(name = "category")
+@Data
+public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    private final String displayName;
+    private String name;
 
-    Category(String displayName) {
-        this.displayName = displayName;
+    @Enumerated(EnumType.STRING)
+    private CategoryType type;
+
+    public Category(String name, CategoryType type) {
+        this.name = name;
+        this.type = type;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public Category() {
+    }
+
+    public enum CategoryType {
+        MAIN_COURSE("Main Course"),
+        STREET_FOOD("Street Food"),
+        SWEETS("Sweets"),
+        BEVERAGES("Beverages");
+
+        private final String displayName;
+
+        CategoryType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+    public CategoryType getType() {
+        return type;
     }
 }
