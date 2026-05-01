@@ -17,11 +17,11 @@ public class MenuController {
     @GetMapping("/menu")
     public String showMenu(Model model){
         model.addAttribute("menuItems", menuService.getAllItems());
-        model.addAttribute("mainCourse", menuService.getByCategory(Category.MAIN_COURSE));
-        model.addAttribute("streetFood", menuService.getByCategory(Category.STREET_FOOD));
-        model.addAttribute("sweets", menuService.getByCategory(Category.SWEETS));
-        model.addAttribute("beverages", menuService.getByCategory(Category.BEVERAGES));
-        model.addAttribute("categories", Category.values());
+        model.addAttribute("mainCourse", menuService.getByCategory(Category.CategoryType.MAIN_COURSE));
+        model.addAttribute("streetFood", menuService.getByCategory(Category.CategoryType.STREET_FOOD));
+        model.addAttribute("sweets", menuService.getByCategory(Category.CategoryType.SWEETS));
+        model.addAttribute("beverages", menuService.getByCategory(Category.CategoryType.BEVERAGES));
+        model.addAttribute("categories", Category.CategoryType.values());
         return "menu";
     }
 }
