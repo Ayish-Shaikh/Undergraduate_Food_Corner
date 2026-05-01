@@ -2,6 +2,7 @@ package com.undergraduate.cloud_food_corner.controller;
 
 
 import com.undergraduate.cloud_food_corner.model.Order;
+import com.undergraduate.cloud_food_corner.repository.OrderRepository;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
+    private final OrderRepository orderRepository;
+
+    public OrderController(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
     @GetMapping("/current")
     public String orderForm(Model model){
         model.addAttribute("order", new Order());
@@ -29,6 +36,7 @@ public class OrderController {
             logger.info("Validation errors: {}", result.getAllErrors());
             return "orderForm";
         }
+        orderRepository.save(order);
         logger.info("Order submitted: {}", order);
         return "redirect:/";
     }
