@@ -40,8 +40,4 @@ public class Category {
             return displayName;
         }
     }
-
-    public CategoryType getType() {
-        return type;
-    }
 }
