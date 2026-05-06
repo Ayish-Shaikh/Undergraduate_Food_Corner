@@ -32,6 +32,11 @@ public class Order {
     private LocalDateTime placedAt;
 
     @ManyToMany
+    @JoinTable(
+            name = "order_menu_items",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_item_id")
+    )
     private List<MenuItem> items = new ArrayList<>();
 
     public void addItem(MenuItem item){
