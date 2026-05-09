@@ -11,10 +11,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/menu", "/images/**").permitAll()
+                .requestMatchers("/", "/menu", "/images/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
         )
-                .formLogin(form -> form.permitAll());
+                .formLogin(form -> form.permitAll())
+                .csrf(csrf -> csrf.disable())
+                .headers(headers ->
+                        headers.frameOptions(frame -> frame.disable()));
         return http.build();
     }
 }
