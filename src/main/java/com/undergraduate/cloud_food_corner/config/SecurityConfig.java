@@ -29,6 +29,14 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .permitAll()
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                )
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions
+                                .disable()
+                        )
                 );
         return http.build();
     }
