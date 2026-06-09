@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Bangaliana</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+    h1 { font-size: 28px; margin-bottom: 30px; text-align: center; color: #333; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #555; font-weight: bold; }
+    input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    input:focus { outline: none; border-color: #333; }
+    button { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #555; }
+    .footer { margin-top: 20px; text-align: center; font-size: 14px; color: #666; }
+    a { color: #333; text-decoration: none; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
+<div class="container">
+  <h1>Login</h1>
 
-<h2>Login</h2>
+  <form method="POST" th:action="@{/login}">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required/>
+    </div>
 
-<form method="post" th:action="@{/login}">
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required/>
+    </div>
 
-  <div>
-    <label>Username:</label>
-    <input type="text" name="username">
+    <button type="submit">Login</button>
+  </form>
+
+  <div class="footer">
+    <p>New user? <a th:href="@{/register}">Register here</a></p>
   </div>
-
-  <div>
-    <label>Password:</label>
-    <input type="password" name="password">
-  </div>
-
-  <button type="submit">Login</button>
-
-</form>
-
-<p>New user? <a th:href="@{/register}">Register here</a></p>
+</div>
 </body>
 </html>
