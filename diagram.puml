@@ -1,158 +1,185 @@
 @startuml
-title Cloud Food Corner - Current Application Flow
+title Bangaliana - Cloud Food Corner Architecture
 
-actor Customer
-participant "Browser" as Browser
-participant "HomeController" as HomeController
-participant "MenuController" as MenuController
-participant "OrderController" as OrderController
-participant "MenuService" as MenuService
-participant "MenuItemRepository" as MenuItemRepository
-participant "OrderRepository" as OrderRepository
-database "H2 Database" as DB
-entity "Category.CategoryType" as CategoryType
-entity "Order Entity" as Order
-participant "Thymeleaf home.html" as HomeView
-participant "Thymeleaf menu.html" as MenuView
-participant "Thymeleaf orderForm.html" as OrderFormView
+!define ABSTRACT_COLOR #E1F5FE
+!define ENTITY_COLOR #F3E5F5
+!define SERVICE_COLOR #E8F5E9
+!define CONTROLLER_COLOR #FFF3E0
+!define REPO_COLOR #FCE4EC
 
-== Home Page ==
-Customer -> Browser : Open application
-Browser -> HomeController : GET /
-HomeController -> HomeView : return "home"
-HomeView --> Browser : Render homepage
-Browser --> Customer : Show home page
+skinparam packageStyle folder
+skinparam backgroundColor #FAFAFA
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #333333
+skinparam arrowColor #555555
+skinparam noteFontSize 11
+skinparam noteBackgroundColor #FFFACD
+skinparam noteBorderColor #DAA520
 
-== Menu Page ==
-Customer -> Browser : Open menu
-Browser -> MenuController : GET /menu
+package "Application" {
+  class CloudFoodCornerApplication <<SpringBootApplication>> #FFF3E0
+}
 
-MenuController -> MenuService : getAllItems()
-MenuService -> MenuItemRepository : findAll()
-MenuItemRepository -> DB : load menu items
-DB --> MenuItemRepository : menu items
-MenuItemRepository --> MenuService : menuItems
-MenuService --> MenuController : menuItems
+package "Configuration" {
+  class SecurityConfig <<Configuration>> #FFF3E0 {
+    - filterChain(HttpSecurity): SecurityFilterChain
+    - passwordEncoder(): PasswordEncoder
+  }
+}
 
-MenuController -> MenuService : getByCategory(MAIN_COURSE)
-MenuService -> MenuItemRepository : findAll()
-MenuItemRepository -> DB : load menu items
-DB --> MenuItemRepository : menu items
-MenuItemRepository --> MenuService : menuItems
-MenuService -> CategoryType : filter by MAIN_COURSE
-MenuService --> MenuController : mainCourse
+package "Controllers" {
+  class HomeController <<Controller>> #FFF3E0 {
+    + home(): String
+  }
 
-MenuController -> MenuService : getByCategory(STREET_FOOD)
-MenuService -> MenuItemRepository : findAll()
-MenuItemRepository -> DB : load menu items
-DB --> MenuItemRepository : menu items
-MenuItemRepository --> MenuService : menuItems
-MenuService -> CategoryType : filter by STREET_FOOD
-MenuService --> MenuController : streetFood
+  class MenuController <<Controller>> #FFF3E0 {
+    - menuService: MenuService
+    + showMenu(Model): String
+  }
 
-MenuController -> MenuService : getByCategory(SWEETS)
-MenuService -> MenuItemRepository : findAll()
-MenuItemRepository -> DB : load menu items
-DB --> MenuItemRepository : menu items
-MenuItemRepository --> MenuService : menuItems
-MenuService -> CategoryType : filter by SWEETS
-MenuService --> MenuController : sweets
+  class OrderController <<Controller>> #FFF3E0 {
+    - orderRepository: OrderRepository
+    + orderForm(Model): String
+    + processOrder(@Valid Order): String
+  }
 
-MenuController -> MenuService : getByCategory(BEVERAGES)
-MenuService -> MenuItemRepository : findAll()
-MenuItemRepository -> DB : load menu items
-DB --> MenuItemRepository : menu items
-MenuItemRepository --> MenuService : menuItems
-MenuService -> CategoryType : filter by BEVERAGES
-MenuService --> MenuController : beverages
+  class LoginController <<Controller>> #FFF3E0 {
+    + showLogin(): String
+  }
 
-MenuController -> CategoryType : read values()
+  class RegistrationController <<Controller>> #FFF3E0 {
+    - userRepository: UserRepository
+    - passwordEncoder: PasswordEncoder
+    + showRegistration(): String
+    + processRegistration(): String
+  }
+}
 
-note right of MenuController
-Adds model attributes:
-- menuItems
-- mainCourse
-- streetFood
-- sweets
-- beverages
-- categories
+package "Services" {
+  class MenuService <<Service>> #E8F5E9 {
+    - menuItemRepository: MenuItemRepository
+    + getAllItems(): List<MenuItem>
+    + getByCategory(CategoryType): List<MenuItem>
+  }
+
+  class UserDetailsServiceImpl <<Service>> #E8F5E9 {
+    - userRepository: UserRepository
+    + loadUserByUsername(String): UserDetails
+  }
+}
+
+package "Repositories" {
+  interface CategoryRepository <<Repository>> #FCE4EC {
+    findAll()
+    save()
+  }
+
+  interface MenuItemRepository <<Repository>> #FCE4EC {
+    findAll()
+    save()
+  }
+
+  interface OrderRepository <<Repository>> #FCE4EC {
+    findAll()
+    save()
+  }
+
+  interface UserRepository <<Repository>> #FCE4EC {
+    findByUsername(String)
+    save()
+  }
+}
+
+package "Models" {
+  class Category <<Entity>> #F3E5F5 {
+    - id: Long
+    - name: String
+    - type: CategoryType
+  }
+
+  enum CategoryType #F3E5F5 {
+    MAIN_COURSE
+    STREET_FOOD
+    SWEETS
+    BEVERAGES
+  }
+
+  class MenuItem <<Entity>> #F3E5F5 {
+    - id: Long
+    - name: String
+    - description: String
+    - price: double
+    - category: Category
+    - imageUrl: String
+  }
+
+  class Order <<Entity>> #F3E5F5 {
+    - id: Long
+    - customerName: String
+    - deliveryAddress: String
+    - phone: String
+    - placedAt: LocalDateTime
+    - items: List<MenuItem>
+  }
+
+  class User <<Entity>> #F3E5F5 {
+    - id: Long
+    - username: String
+    - password: String
+    - fullName: String
+    - street: String
+    - city: String
+    - state: String
+    - zip: String
+    - phoneNumber: String
+  }
+}
+
+' Relationships
+MenuController --> MenuService : uses
+MenuService --> MenuItemRepository : queries
+OrderController --> OrderRepository : persists
+RegistrationController --> UserRepository : saves user
+RegistrationController --> SecurityConfig : uses encoder
+LoginController ..> SecurityConfig : authenticates
+UserDetailsServiceImpl --> UserRepository : loads user
+UserDetailsServiceImpl ..> User : returns
+
+CategoryRepository --> Category : manages
+MenuItemRepository --> MenuItem : manages
+MenuItemRepository --> Category : references
+OrderRepository --> Order : manages
+OrderRepository --> MenuItem : links
+UserRepository --> User : manages
+
+MenuItem --> Category : belongs to
+Order --> MenuItem : contains
+Category --> CategoryType : uses
+User ..|> "<<UserDetails>>" : implements
+
+' Notes
+note right of SecurityConfig
+  Configures form login authentication
+  Permits public routes
+  Requires authentication for orders
 end note
 
-MenuController -> MenuView : return "menu" with model
-MenuView --> Browser : Render categorized menu
-Browser --> Customer : Show menu page
-
-== Order Form ==
-Customer -> Browser : Click "Place Order"
-Browser -> OrderController : GET /order/current
-OrderController -> Order : new Order()
-OrderController -> OrderFormView : return "orderForm" with order
-OrderFormView --> Browser : Render order form
-Browser --> Customer : Show order form
-
-== Order Submission ==
-Customer -> Browser : Submit order details
-Browser -> OrderController : POST /order
-OrderController -> OrderController : validate submitted Order
-
-alt Validation errors
-    OrderController -> OrderFormView : return "orderForm"
-    OrderFormView --> Browser : Render validation errors
-    Browser --> Customer : Show form with field errors
-else Valid order
-    OrderController -> OrderRepository : save(order)
-    OrderRepository -> DB : insert into orders
-    DB --> OrderRepository : saved order
-    OrderRepository --> OrderController : saved order
-    OrderController -> OrderController : log submitted Order
-    OrderController --> Browser : redirect:/
-    Browser -> HomeController : GET /
-    HomeController -> HomeView : return "home"
-    HomeView --> Browser : Render homepage
-    Browser --> Customer : Show redirected home page
-end
-
-note over Browser, DB
-Current state:
-- Server-rendered Spring MVC app
-- Thymeleaf templates for UI
-- H2 in-memory database configured
-- Menu items are loaded through MenuItemRepository
-- MenuService still filters categories in memory after loading all items
-- Order form binds to the Order entity
-- Valid submitted orders are saved through OrderRepository
-- No cart, checkout, payment gateway, or order tracking flow yet
+note right of MenuService
+  Business logic for menu operations
+  Filters items by category
+  Loads from database via repository
 end note
 
-== Future Improvements ==
-participant "CartController" as CartController
-participant "CheckoutController" as CheckoutController
-participant "PaymentController" as PaymentController
-participant "Payment Gateway" as PaymentGateway
-
-Browser -> CartController : POST /cart
-CartController -> DB : store cart state
-DB --> CartController : updated cart
-CartController --> Browser : updated cart view/response
-
-Browser -> CheckoutController : POST /checkout
-CheckoutController -> OrderRepository : save finalized order
-OrderRepository -> DB : persist order and status
-DB --> OrderRepository : order id / status
-OrderRepository --> CheckoutController : saved order
-CheckoutController -> PaymentController : initiate payment
-PaymentController -> PaymentGateway : process payment
-PaymentGateway --> PaymentController : payment status
-PaymentController --> CheckoutController : payment result
-CheckoutController --> Browser : order confirmation
-
-note over CartController, PaymentGateway
-Recommended next steps:
-- Use repository queries for category-specific menu loading
-- Add cart persistence and cart UI state
-- Add checkout flow before final order submission
-- Integrate payment processing
-- Add order confirmation and status tracking
-- Persist selected menu items with the order
+note right of UserDetailsServiceImpl
+  Spring Security integration
+  Loads user from database
+  Throws exception if not found
 end note
+
+note bottom of Order
+  @ManyToMany relationship with MenuItem
+  @CreationTimestamp for order tracking
+  Form validation with @NotBlank, @Pattern
+end note
+
 @enduml
